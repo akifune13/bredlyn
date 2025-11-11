@@ -24,3 +24,8 @@ build/
 
 # Optional: Mac system files
 *.swp
+
+# json files
+emojis.json
+linkedAccounts.json
+

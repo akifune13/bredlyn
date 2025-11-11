@@ -5,9 +5,6 @@ dotenv.config();
 
 let api = null;
 
-/**
- * Get or create a single osu! API instance
- */
 export async function getApi() {
   if (!api) {
     api = await osu.API.createAsync(

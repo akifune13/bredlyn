@@ -1,10 +1,10 @@
+// osuApi.js
 import * as osu from "osu-api-v2-js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 let api = null;
-
 export async function getApi() {
   if (!api) {
     api = await osu.API.createAsync(
@@ -16,10 +16,20 @@ export async function getApi() {
 }
 
 /**
- * Fetch osu! user profile by username
- * @param {string} username
- * @returns {Promise<Object>} user object
+ * Parse ONLY the ended_at field into unix seconds (or null).
+ * - If ended_at is an ISO string => Date.parse -> milliseconds -> /1000
+ * - If it's a numeric epoch (rare) we handle seconds vs ms safely.
  */
+export function parseEndedAtToUnixSeconds(score) {
+  if (!score || !score.ended_at) return null;
+  const ms = Date.parse(score.ended_at); // Date.parse returns milliseconds
+  if (isNaN(ms)) return null;
+  return Math.floor(ms / 1000); // <- integer seconds
+}
+
+
+/* ---------- API fetch + normalization ---------- */
+
 export async function getUserProfile(username) {
   try {
     const api = await getApi();
@@ -31,10 +41,7 @@ export async function getUserProfile(username) {
 }
 
 /**
- * Fetch top plays for a user
- * @param {string} username
- * @param {number} limit
- * @returns {Promise<Array>} array of top scores
+ * Fetch top plays for a user and attach parsed_timestamp (based only on ended_at)
  */
 export async function getUserTopPlays(username, limit = 5) {
   try {
@@ -47,7 +54,24 @@ export async function getUserTopPlays(username, limit = 5) {
       { lazer: false },
       { limit }
     );
-    return scores;
+
+    const normalized = scores.map((s) => {
+      const parsedTs = parseEndedAtToUnixSeconds(s); // seconds
+      const mapId = s.beatmapset?.id
+        ?? s.beatmapset_id
+        ?? s.beatmap?.beatmapset_id
+        ?? s.beatmap?.set_id
+        ?? null;
+
+      return {
+        ...s,
+        parsed_timestamp: parsedTs,
+        normalized_map_id: mapId
+      };
+    });
+
+
+    return normalized;
   } catch (err) {
     console.error(`Error fetching top plays for ${username}:`, err);
     throw err;

@@ -1,11 +1,17 @@
+// utils/gradeEmojis.js
 import fs from "fs";
 import path from "path";
 
-// Load emojis from JSON
+// Load emojis from JSON (ignored by git if you put it in .gitignore)
 const emojisPath = path.join(process.cwd(), "emojis.json");
-let gradeEmojis = {};
+export let gradeEmojis = {};
 if (fs.existsSync(emojisPath)) {
-  gradeEmojis = JSON.parse(fs.readFileSync(emojisPath, "utf-8"));
+  try {
+    gradeEmojis = JSON.parse(fs.readFileSync(emojisPath, "utf-8"));
+  } catch (err) {
+    console.warn("Failed to parse emojis.json:", err);
+    gradeEmojis = {};
+  }
 } else {
   console.warn("Warning: emojis.json not found. Grades will fallback to text.");
 }
@@ -13,15 +19,23 @@ if (fs.existsSync(emojisPath)) {
 // Format numbers with commas
 export function fmt(n) {
   if (n === undefined || n === null) return "N/A";
-  return n.toLocaleString();
+  if (typeof n === "number") return n.toLocaleString();
+  const num = Number(n);
+  return Number.isNaN(num) ? String(n) : num.toLocaleString();
 }
 
 // Safe fixed decimal formatting
 export function safeFixed(n, d = 2) {
-  return typeof n === "number" ? n.toFixed(d) : "N/A";
+  return typeof n === "number" ? n.toFixed(d) : (Number(n) ? Number(n).toFixed(d) : "N/A");
 }
 
-// Build grade text for embed using JSON emojis
+// Build a small helper to get single emoji by key (ssh, ss, sh, s, a, b, ...)
+export function emojiForKey(key) {
+  if (!key) return null;
+  return gradeEmojis[key] ?? null;
+}
+
+// Build grade text for embed using JSON emojis (keeps old usage compatibility)
 export function buildGradesForDisplay(stats = {}) {
   const sssh = stats.grade_counts?.ssh ?? stats.counts?.ss_h ?? 0;
   const ss   = stats.grade_counts?.ss  ?? stats.counts?.ss   ?? 0;

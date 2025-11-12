@@ -26,6 +26,7 @@ client.prefix = configFile.defaultPrefix || "!";
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith(".js"));
 
+// Load all command files
 for (const file of commandFiles) {
   const commandModule = await import(`./commands/${file}`);
   const commandName = (commandModule.data && commandModule.data.name) || file.replace(".js", "");
@@ -36,8 +37,17 @@ for (const file of commandFiles) {
     continue;
   }
 
-  client.commands.set(commandName.toLowerCase(), { data: commandModule.data, execute });
+  // Register the primary command name
+  client.commands.set(commandName.toLowerCase(), { data: commandModule, execute });
+
+  // Register aliases, if any
+  if (Array.isArray(commandModule.aliases)) {
+    for (const alias of commandModule.aliases) {
+      client.commands.set(alias.toLowerCase(), { data: commandModule, execute });
+    }
+  }
 }
+
 
 
 // Bot ready
@@ -58,7 +68,7 @@ client.on("messageCreate", async message => {
   try {
 
     await message.channel.sendTyping();
-    
+
     // Create a fake interaction for compatibility with execute()
     const interaction = {
     reply: (msg) => message.reply(msg),

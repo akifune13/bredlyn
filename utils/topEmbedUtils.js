@@ -2,46 +2,7 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { buildModString } from "./osuUtils.js";
 import { getGradeKey, emojiForKey, fmt, safeFixed } from "./gradeUtils.js";
-import { getApi } from "./osuApi.js";
-
-/**
- * Cache for star ratings to avoid repeated API calls
- */
-const starRatingCache = new Map();
-
-/**
- * Get mod-adjusted star rating for a score
- */
-async function getModAdjustedStarRating(score) {
-  try {
-    const diff = score.beatmap ?? {};
-    const baseSR = diff?.difficulty_rating ?? null;
-    const mods = score.mods || [];
-
-    // If no mods, just return base SR
-    if (mods.length === 0) return baseSR;
-
-    // Create cache key from beatmap ID and mods
-    const modAcronyms = mods.map(m => m.acronym || m).sort().join("");
-    const cacheKey = `${diff.id}-${modAcronyms}`;
-
-    // Check cache first
-    if (starRatingCache.has(cacheKey)) return starRatingCache.get(cacheKey);
-
-    // Fetch mod-adjusted difficulty attributes
-    const api = await getApi();
-    const attributes = await api.getBeatmapDifficultyAttributesOsu(score.beatmap, score.mods);
-    const adjustedSR = attributes?.star_rating ?? baseSR;
-
-    // Cache the result
-    starRatingCache.set(cacheKey, adjustedSR);
-
-    return adjustedSR;
-  } catch (error) {
-    // Fallback to base SR if API call fails
-    return score.beatmap?.difficulty_rating ?? null;
-  }
-}
+import { getModAdjustedStarRating } from "./srCalcUtils.js"; // ✅ NEW IMPORT
 
 /**
  * Build a single play block for the embed description

@@ -1,5 +1,5 @@
 import { EmbedBuilder } from "discord.js";
-import { buildGradesForDisplay, fmt, safeFixed } from "./gradeEmojis.js";
+import { buildGradesForDisplay, fmt, safeFixed } from "./gradeUtils.js";
 
 /**
  * Build an embed for a user's osu! profile

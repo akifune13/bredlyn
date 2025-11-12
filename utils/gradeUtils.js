@@ -35,6 +35,22 @@ export function emojiForKey(key) {
   return gradeEmojis[key] ?? null;
 }
 
+// Map osu! score rank string from API to grade key
+export function getGradeKey(score) {
+  const rank = score.rank ?? score.grade ?? null;
+  switch ((rank ?? "").toUpperCase()) {
+    case "XH": return "ssh";
+    case "SH": return "sh";
+    case "X":  return "x";
+    case "S":  return "s";
+    case "A":  return "a";
+    case "B":  return "b";
+    case "C":  return "c";
+    case "D":  return "d";
+    default:   return null;
+  }
+}
+
 // Build grade text for embed using JSON emojis (keeps old usage compatibility)
 export function buildGradesForDisplay(stats = {}) {
   const sssh = stats.grade_counts?.ssh ?? stats.counts?.ss_h ?? 0;

@@ -1,6 +1,6 @@
 import fs from "fs";
 import { getUserProfile } from "../utils/osuApi.js";
-import { buildGradesForDisplay } from "../utils/gradeEmojis.js";
+import { buildGradesForDisplay } from "../utils/gradeUtils.js";
 import { buildProfileEmbed } from "../utils/profileEmbedUtils.js";
 
 export const name = "profile";

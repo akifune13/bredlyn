@@ -1,4 +1,4 @@
-import { gradeEmojis, emojiForKey } from "./gradeEmojis.js";
+import { gradeEmojis, emojiForKey } from "./gradeUtils.js";
 
 // Hitcounts & accuracy
 export function getHitCounts(score) {

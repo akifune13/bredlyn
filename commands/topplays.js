@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getUserTopPlays, getUserProfile } from "../utils/osuApi.js";
-import { fmt, safeFixed } from "../utils/gradeEmojis.js";
+import { fmt, safeFixed } from "../utils/gradeUtils.js";
 import { formatBigNumber, timeAgo, sendAndGetMessage } from "../utils/miscUtils.js";
 import { buildEmbed, createNavButtons } from "../utils/topEmbedUtils.js";
 

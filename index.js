@@ -56,6 +56,9 @@ client.on("messageCreate", async message => {
   if (!command) return;
 
   try {
+
+    await message.channel.sendTyping();
+    
     // Create a fake interaction for compatibility with execute()
     const interaction = {
     reply: (msg) => message.reply(msg),

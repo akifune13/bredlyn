@@ -35,7 +35,7 @@ To run your own instance of Bredlyn, follow these steps:
 
 2.  **Install dependencies:**
     ```sh
-    npm install
+    npm install discord.js dotenv node-fetch axios quick-lru
     ```
 
 3.  **Configure environment variables:**
